@@ -13,6 +13,7 @@
 (defvar data-url "https://raw.githubusercontent.com/LukeSmithxyz/kjv/master/kjv.tsv")
 (defvar data-cache-loc "/tmp/kjv-bible-data.txt")
 (defvar book-cache-loc "/tmp/kjv-bible-book-list.txt")
+(defparameter book-list nil)
 
 ;; TODO Change temp dir param depending on OS
 ;; Not priority ;)
@@ -22,7 +23,7 @@
 ;;           (string= os "Windows") (error (c)
 ;;                                     (format t "This doesn't support Windows yet, please use a Linux Distro.~&")
 ;;                                     (values nil c)))))
-  
+
 
 ;;; Main Functions
 (defun download-bible-data ()
@@ -42,28 +43,43 @@
   (with-open-file (*standard-input* data-cache-loc)
     (loop :for read-line := (read-line *standard-input* nil) :while read-line :collect read-line)))
 
-(defvar bible-books-list '("Genesis"
-                           "Exodus"
-                           "Leviticus"))
-  ;TODO optionally have func programatically update this list from the plaintext file
-  ;ie, get each line, grab string up to first tab char, put in list, remove dupes
-
 (defun update-books-list ()
   "Update the list of books and save into a file.
-Parse main data file and create text document for displaying the books.
+Parse main data file and create text document for displaying the books based on what the bible data is - if formatting is correct.
 The purpose of this is based on if I (or others) decide to update the main file with new books - ie septuigent etc."
   (if (probe-file data-cache-loc)
-      (lambda ()
-        (print "File exists."))
-      ;TODO Create check so the below doesn't loop
+      (and (setq book-list (with-open-file (*standard-input* data-cache-loc)
+        (loop :for line := (read-line *standard-input* nil)
+              :while line
+              :collect (first (split-string-with-delimiter line :delimiter #\Tab)))))
+           (and (setq book-list (delete-duplicates book-list :test #'string-equal))
+                (with-open-file (file #P"/tmp/kjv-bible-book-list.txt"
+                                      :direction :output
+                                      :if-exists :append
+                                      :if-does-not-exist :create)
+                   (dolist (line book-list)
+                     (write-line line file)))))
+      
       (and (download-bible-data)
            (update-books-list))))
 
+;;https://stackoverflow.com/questions/59516459/split-string-by-delimiter-and-include-delimiter-common-lisp
+(defun split-string-with-delimiter (string
+                                    &key (delimiter #\ )
+                                    &aux (l (length string)))
+  (loop for start = 0 then (1+ pos)
+        for pos   = (position delimiter string :start start)
+        when (and (null pos) (not (= start l)))
+        collect (subseq string start)
+        while pos
+        when (> pos start) collect (subseq string start pos)))
+
 (defun print-all-book-names ()
-  "Prints all book names based on BIBLE-BOOKS-LIST"
+  "Prints all book names from BOOKS-LIST or name.
+If cached books file exists then print that, otherwise run UPDATE-BOOKS-LIST and return the list of books."
   (if (probe-file book-cache-loc)
-      ;TODO write lambda func for generating printing contents of text file 
-      (lambda ()
-        (print "File exists."))
-      (format t "~A~%" bible-books-list)))
+        (with-open-file (*standard-input* book-cache-loc)
+          (loop :for line := (read-line *standard-input* nil) :while line :collect line))      
+        (and (update-books-list)
+             (print book-list))))
 
