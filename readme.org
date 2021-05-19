@@ -1,0 +1,14 @@
+* CL-Bible
+
+A script written in common lisp for accessing information about the KJV bible.
+
+So far what you can do with is limited, but if you're intersted to see what the intended v1 will look like then read the TODO section.
+
+** Dependencies
+- _[[https://github.com/eudoxia0/trivial-download][trivial-download]]_
+
+** TODO
+- Print verses in REPL properly with navigation
+- Search passages
+- Get information from verses based on seperate file
+- Gather all quotes from people
