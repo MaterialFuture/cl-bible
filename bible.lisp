@@ -1,17 +1,44 @@
-;;; Bible script for reading and searching for bible passages
+;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp -*-
+;;;
+;;; cl-bible - Bible script for reading and searching for bible passages
+;;;
+;;; Copyright © 2021 Konstantine V @Materialfuture
+;;;
+;;; Permission is hereby granted, free of charge, to any person obtaining a
+;;; copy of this software and associated documentation files (the
+;;; "Software"), to deal in the Software without restriction, including
+;;; without limitation the rights to use, copy, modify, merge, publish,
+;;; distribute, sublicense, and/or sell copies of the Software, and to
+;;; permit persons to whom the Software is furnished to do so, subject to
+;;; the following conditions:
+;;;
+;;; The above copyright notice and this permission notice shall be included
+;;; in all copies or substantial portions of the Software.
+;;;
+;;; THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+;;; OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+;;; MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+;;; NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+;;; LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+;;; OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+;;; WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-(defpackage #:cl-bible
+(defpackage   #:cl-bible
   (:nicknames :bible)
-  (:use #:common-lisp)
-  (:export :get-bible-data
-           :parse-bible-data))
+  (:use       #:common-lisp)
+  (:export    :get-bible-data
+              :parse-bible-data
+              :download-bible-data
+              :update-books-list
+              :print-all-books))
 
 (ql:quickload "trivial-download")
 
 (defvar data-url "https://raw.githubusercontent.com/LukeSmithxyz/kjv/master/kjv.tsv")
-(defvar data-cache-loc "/tmp/kjv-bible-data.txt")
-(defvar book-cache-loc "/tmp/kjv-bible-book-list.txt")
+(defvar data-cache-loc "/tmp/kjv-bible-data")
+(defvar book-cache-loc "/tmp/kjv-bible-book-list")
 (defparameter book-list nil)
+(defparameter search-results nil)
 
 ;; TODO Change temp dir param depending on OS
 ;; Not priority ;)
@@ -24,33 +51,10 @@
 
 (defun download-bible-data ()
   "Download the kjv bible data in plaintext format from GitHub"
+  ;;TODO Include Data in repo to remove having the trivial-download lib
   (if (probe-file data-cache-loc)
       (print "File exists.")
       (trivial-download:download data-url data-cache-loc)))
-
-(defun search-bible-data (&optional str)
-  "search bible data for STR or just return book data"
-  (with-open-file (*standard-input* data-cache-loc)
-    (loop :for read-line := (read-line *standard-input* nil) :while read-line :collect read-line)))
-
-(defun update-books-list ()
-  "Update the list of books and save into a file.
-Parse main data file and create text document for displaying the books based on what the bible data is - if formatting is correct.
-The purpose of this is based on if I (or others) decide to update the main file with new books - ie septuigent etc."
-  (if (probe-file data-cache-loc)
-      (and (setq book-list (with-open-file (*standard-input* data-cache-loc)
-        (loop :for line := (read-line *standard-input* nil)
-              :while line
-              :collect (first (split-string-with-delimiter line :delimiter #\Tab)))))
-           (and (setq book-list (delete-duplicates book-list :test #'string-equal))
-                (with-open-file (file #P"/tmp/kjv-bible-book-list.txt" ;TODO remove hardcoded path for variable
-                                      :direction :output
-                                      :if-exists :append
-                                      :if-does-not-exist :create)
-                   (dolist (line book-list)
-                     (write-line line file)))))
-      (and (download-bible-data)
-           (update-books-list))))
 
 ;;https://stackoverflow.com/questions/59516459/split-string-by-delimiter-and-include-delimiter-common-lisp
 (defun split-string-with-delimiter (string
@@ -64,12 +68,41 @@ The purpose of this is based on if I (or others) decide to update the main file 
         :while pos
         :when (> pos start) :collect (subseq string start pos)))
 
-(defun print-all-book-names ()
+(defun update-books-list ()
+  "Update the list of books and save into a file.
+Parse main data file and create text document for displaying the books based on what the bible data is - if formatting is correct.
+The purpose of this is based on if I (or others) decide to update the main file with new books - ie septuigent etc."
+  (if (probe-file data-cache-loc)
+      (and (setq book-list (with-open-file (*standard-input* data-cache-loc)
+        (loop :for line := (read-line *standard-input* nil)
+              :while line
+              :collect (first (split-string-with-delimiter line :delimiter #\Tab)))))
+        (and (setq book-list (delete-duplicates book-list :test #'string-equal))
+             (with-open-file (file book-cache-loc
+                                   :direction :output
+                                   :if-exists :append
+                                   :if-does-not-exist :create)
+               (dolist (line book-list)
+                 (write-line line file)))))
+      (and (download-bible-data)
+           (update-books-list))))
+
+(defun print-all-books ()
   "Prints all book names from BOOKS-LIST or name.
 If cached books file exists then print that, otherwise run UPDATE-BOOKS-LIST and return the list of books."
   (if (probe-file book-cache-loc)
         (with-open-file (*standard-input* book-cache-loc)
-          (loop :for line := (read-line *standard-input* nil) :while line :collect line))      
-        (and (update-books-list)
-             (print book-list))))
+          (loop :for line := (read-line *standard-input* nil) :while line :collect line))
+      (and (update-books-list)
+           (print book-list))))
 
+(defun search-bible-data (&optional string)
+  "Search bible data for STR or just return book data"
+  (with-open-file (*standard-input* data-cache-loc)
+    (loop :for line := (read-line *standard-input* nil)
+          :while line
+          :collect (split-string-with-delimiter line :delimiter #\Tab))))
+
+;; use lambda
+(defun search-for-string(str)
+  )
