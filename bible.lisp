@@ -1,6 +1,6 @@
 ;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp -*-
 ;;;
-;;; cl-bible - Bible script for reading and searching for bible passages
+;;; cl-bible - Bible script for reading and searching for bible passages from the King James Version
 ;;;
 ;;; Copyright © 2021 Konstantine V @Materialfuture
 ;;;
@@ -32,11 +32,10 @@
               :update-books-list
               :print-all-books))
 
-(ql:quickload "trivial-download")
-
-(defvar data-url "https://raw.githubusercontent.com/LukeSmithxyz/kjv/master/kjv.tsv")
+(defvar data-url "data/kjv.tsv")
 (defvar data-cache-loc "/tmp/kjv-bible-data")
 (defvar book-cache-loc "/tmp/kjv-bible-book-list")
+
 (defparameter book-list nil)
 (defparameter search-results nil)
 
@@ -50,11 +49,10 @@
 ;;                                     (values nil c)))))
 
 (defun download-bible-data ()
-  "Download the kjv bible data in plaintext format from GitHub"
-  ;;TODO Include Data in repo to remove having the trivial-download lib
-  (if (probe-file data-cache-loc)
+  "Checks to see if you already have the file in your /tmp dir otherwise to copy from the repository."
+    (if (probe-file data-cache-loc)
       (print "File exists.")
-      (trivial-download:download data-url data-cache-loc)))
+      (uiop:copy-file data-url data-cache-loc)))
 
 ;;https://stackoverflow.com/questions/59516459/split-string-by-delimiter-and-include-delimiter-common-lisp
 (defun split-string-with-delimiter (string
@@ -103,6 +101,5 @@ If cached books file exists then print that, otherwise run UPDATE-BOOKS-LIST and
           :while line
           :collect (split-string-with-delimiter line :delimiter #\Tab))))
 
-;; use lambda
 (defun search-for-string(str)
-  )
+  (princ "test"))
