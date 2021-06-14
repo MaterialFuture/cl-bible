@@ -16,6 +16,12 @@ So far what you can do with is limited, but if you're intersted to see what the 
 
 ** _Todo_
 - Print verses in REPL properly with navigation
-- Search passages
+- Search passages based on various methods
+  - verse "code"
+  - book name
+  - String search
 - Get information from verses based on seperate file
-- Gather all quotes from people
+- Seperate some functions into seperate files
+- Create another version that works on CLI via Roswell
+- Be able to import other books such as the apocrypha
+- Include the bible data file within the project
