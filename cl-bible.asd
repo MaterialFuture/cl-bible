@@ -14,6 +14,7 @@
   :depends-on (:uiop)
   :pathname "src/"
   :components ((:file "./utils")
-               (:file "./books" :depends-on ("./utils")))
+               (:file "./books" :depends-on ("./utils")
+               (:file "./verses")))
   :description "Bible library"
   :long-description "A library for reading and searching for bible passages from the King James Version")
