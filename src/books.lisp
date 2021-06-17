@@ -1,11 +1,18 @@
 (defpackage cl-bible.books
-  (:use #:cl
+  (:use #:common-lisp
         #:cl-bible)
-  (:import-from #:cl-bible.utils
-                #:split-string-with-delimiter)
-  (:export #:update-books-list
-           #:print-all-books))
+  (:local-nicknames (:utils :cl-bible.utils))
+  (:export
+   :update-books-list
+   :print-all-books))
+
 (in-package :cl-bible.books)
+
+(defvar data-cache-loc "/tmp/kjv-bible-data")
+(defvar book-cache-loc "/tmp/kjv-bible-book-list")
+
+(defparameter book-list nil)
+(defparameter search-results nil)
 
 (defun update-books-list ()
   "Update the list of books and save into a file.
@@ -23,7 +30,7 @@ The purpose of this is based on if I (or others) decide to update the main file 
                                    :if-does-not-exist :create)
                (dolist (line book-list)
                  (write-line line file)))))
-      (and (download-bible-data)
+      (and (utils:download-bible-data)
            (update-books-list))))
 
 (defun print-all-books ()

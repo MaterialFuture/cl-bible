@@ -1,4 +1,4 @@
-;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp; Base: 10 -*-
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp -*-
 
 (defpackage #:cl-bible
   (:use :cl :asdf))
@@ -13,9 +13,7 @@
   :license "GPLv3"
   :depends-on (:uiop)
   :pathname "src/"
-  :components (
-               ;; (:file "cl-bible" :depends-on ("./books" "./utils"))
-               (:file "./utils")
+  :components ((:file "./utils")
                (:file "./books" :depends-on ("./utils")))
   :description "Bible library"
   :long-description "A library for reading and searching for bible passages from the King James Version")

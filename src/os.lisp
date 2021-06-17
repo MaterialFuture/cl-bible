@@ -1,3 +1,5 @@
+;;;; -*- Mode: Lisp; Syntax: ANSI-Common-Lisp -*-
+
 (defpackage cl-bible.os
   (:use #:cl
         #:cl-bible)
