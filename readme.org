@@ -5,16 +5,45 @@ My intention was to create a tool for me to study bible verses and to practice C
 
 So far what you can do with is limited, but if you're intersted to see what the intended v1 will look like then read the TODO section.
 
-** Run
-#+begin_src lisp
-  CL-USER> (download-bible-data) ;#> Downloads bible data
-           (update-books-list) ;#> Updates the list of books
+** Install
+*** Git
+#+begin_src shell
+$ git clone <repo>
 #+end_src
+
+*** Loading via Slime/Sly
+#+begin_src lisp
+  CL-USER> (asdf:load-asd "/absolute/path/to/cl-bible.asd")
+           (asdf:load-system :cl-bible)
+#+end_src
+
+** Run
+*** Preliminary
+The first thing recommended is to run the commands below in the REPL, these commands are self-explanitory and are needed to continue.
+
+#+begin_src lisp
+  CL-USER> (SAVE-BIBLE-DATA)   ;#> Saves the bible data as needed
+           (UPDATE-BOOKS-LIST) ;#> Updates the list of books based on data in cache
+#+end_src
+
+*** Main Commands
+These main commands are intended to return plaintext data for human readability. These will be another set of commands that return the data in list format for the use of other Lisp programs to be able to read.
+
+#+begin_src lisp
+(PRINT-ALL-BOOKS) ;#> Prints all the books of the bible in sequential order
+(SEARCH-BOOKS book) ;#> TODO Will search for books matching the name and return verse data
+(SEARCH-VERSES book verse) ;#> TODO Search for verses based on colon formatted
+(SEARCH-KEYWORDS keyword) ;#> TODO Keyword search for verses based on keywords
+(SEARCH-BIBLE string) ;#> TODO Searches all of the bible for keywords or books that match and returns relevant data
+#+end_src
+
+These are still a work in progress
 
 ** Dependencies
 - _[[https://github.com/eudoxia0/trivial-download][trivial-download]]_
 
 ** _Todo_
+- Be able to download other formatted books
 - Print verses in REPL properly with navigation
 - Search passages based on various methods
   - verse "code"
