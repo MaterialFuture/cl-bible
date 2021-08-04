@@ -32,7 +32,7 @@ The purpose of this is based on if I (or others) decide to update the main file 
                                    :if-does-not-exist :create)
                (dolist (line book-list)
                  (write-line line file)))))
-      (and (utils:download-bible-data)
+      (and (utils:save-bible-data)
            (update-books-list))))
 
 (defun print-all-books ()

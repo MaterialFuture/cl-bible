@@ -5,14 +5,14 @@
         #:cl-bible)
   (:export
    :split-string-with-delimiter
-   :download-bible-data))
+   :save-bible-data))
 
 (in-package :cl-bible.utils)
 
 (defvar data-url "data/kjv.tsv")
 (defvar data-cache-loc "/tmp/kjv-bible-data")
 
-(defun download-bible-data ()
+(defun save-bible-data ()
   "Checks to see if you already have the file in your /tmp dir otherwise to copy from the repository.
 Moving the file to your temp directory to improve the portability of the application."
     (if (probe-file data-cache-loc)

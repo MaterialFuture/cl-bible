@@ -23,11 +23,17 @@
   "Search the books in the bible based on PRINT-ALL-BOOKS"
   (format T "~d" book))
 
-(defun search-verse (book verse)
+(defun search-keywords (keyword)
+  "Search bible for keyword and return"
+  (format T "~s" keyword))
+
+(defun search-verses (book verse)
   "Search bible for verse and return
 TODO: parse verse for colons"
   (format T "~s, ~s" book verse))
 
 (defun search-bible (string)
   "Search all of bible for string and return all matching cases as list of strings"
+  ;; TODO If matches book name search books first
+  ;; If not then search all verses
   (format T "~s" string))
