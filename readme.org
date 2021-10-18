@@ -1,4 +1,6 @@
 * CL-Bible
+*Update*: My focus will mainly be on [[https://github.com/MaterialFuture/bible-lib][Clojure Bible Library]].
+
 A script written in common lisp for accessing information about the KJV bible.
 
 My intention was to create a tool for me to study bible verses and to practice Common Lisp with more focus on the later.
